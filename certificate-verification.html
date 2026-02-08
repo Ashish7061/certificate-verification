@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Certificate Verification System</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .card {
+        background: #fff;
+        width: 420px;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .logo img {
+        width: 180px;
+        height: auto;
+        margin-bottom: 10px;
+        object-fit: contain;
+    }
+
+    h1 {
+        color: #2a5298;
+        margin-bottom: 5px;
+    }
+
+    p {
+        font-size: 14px;
+        color: #555;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        font-size: 16px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        font-size: 16px;
+        background: #2a5298;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1e3c72;
+    }
+
+    .error {
+        margin-top: 15px;
+        padding: 10px;
+        background: #fdecea;
+        color: #c62828;
+        border-left: 4px solid #c62828;
+        display: none;
+        font-size: 14px;
+    }
+
+    /* Loading */
+    .loading {
+        display: none;
+        margin-top: 15px;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #ccc;
+        border-top: 4px solid #2a5298;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: auto;
+    }
+
+    @keyframes spin {
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Success Tick */
+    .success {
+        display: none;
+        margin-top: 15px;
+        color: #2e7d32;
+        font-weight: bold;
+    }
+
+    .checkmark svg {
+        width: 60px;
+        height: 60px;
+        stroke: #2e7d32;
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .checkmark circle {
+        stroke-dasharray: 157;
+        stroke-dashoffset: 157;
+        animation: circle 0.6s ease-out forwards;
+    }
+
+    .checkmark path {
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+        animation: check 0.3s ease-out 0.6s forwards;
+    }
+
+    @keyframes circle {
+        to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes check {
+        to { stroke-dashoffset: 0; }
+    }
+
+    /* Badge */
+    .badge-container {
+        display: none;
+        margin-top: 20px;
+    }
+
+    .badge-container img {
+        width: 100%;
+        border-radius: 10px;
+        border: 2px solid #2a5298;
+    }
+
+    .footer {
+        margin-top: 12px;
+        font-size: 11px;
+        color: #888;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <!-- LOGO -->
+    <div class="logo">
+        <img src="logo.png" alt="VIVEDU Academy Logo">
+    </div>
+
+    <h1>Certificate Verification</h1>
+    <p>Verify student certificate authenticity</p>
+
+    <input type="text" id="certInput" placeholder="Enter Certificate Number">
+    <button onclick="verifyCertificate()">Verify Certificate</button>
+
+    <!-- Loading -->
+    <div class="loading" id="loadingBox">
+        <div class="spinner"></div>
+        <p>Verifying certificate...</p>
+    </div>
+
+    <!-- Success -->
+    <div class="success" id="successBox">
+        <div class="checkmark">
+            <svg viewBox="0 0 52 52">
+                <circle cx="26" cy="26" r="25" fill="none"/>
+                <path fill="none" d="M14 27l7 7 16-16"/>
+            </svg>
+        </div>
+        <p>Certificate Verified</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error" id="errorMsg"></div>
+
+    <!-- Badge -->
+    <div class="badge-container" id="badgeBox">
+        <img id="badgeImage" src="" alt="Student Badge">
+    </div>
+
+    <div class="footer">
+        © VIVEDU ACADEMY
+    </div>
+</div>
+
+<script>
+    // Certificate Database
+    const certificateDB = {
+        "VA260001": { badge: "badges/1.png" },
+        "VA260002": { badge: "badges/2.png" },
+        "VA260003": { badge: "badges/3.png" },
+        "VA260004": { badge: "badges/4.png" },
+        "VA260005": { badge: "badges/5.png" },
+        "VA260006": { badge: "badges/6.png" },
+        "VA260007": { badge: "badges/7.png" },
+        "VA260008": { badge: "badges/8.png" },
+        "VA260009": { badge: "badges/9.png" },
+        "VA260010": { badge: "badges/10.png" }
+    };
+
+    function verifyCertificate() {
+        const certNo = document.getElementById("certInput").value.trim();
+        const error = document.getElementById("errorMsg");
+        const badgeBox = document.getElementById("badgeBox");
+        const badgeImg = document.getElementById("badgeImage");
+        const loading = document.getElementById("loadingBox");
+        const success = document.getElementById("successBox");
+
+        // Reset
+        error.style.display = "none";
+        badgeBox.style.display = "none";
+        success.style.display = "none";
+        loading.style.display = "block";
+
+        setTimeout(() => {
+            loading.style.display = "none";
+
+            if (certificateDB[certNo]) {
+                success.style.display = "block";
+                badgeImg.src = certificateDB[certNo].badge;
+
+                setTimeout(() => {
+                    badgeBox.style.display = "block";
+                }, 500);
+
+            } else {
+                error.style.display = "block";
+                error.innerHTML = "❌ Invalid or Unverified Certificate Number";
+            }
+        }, 1500);
+    }
+</script>
+
+</body>
+</html>
