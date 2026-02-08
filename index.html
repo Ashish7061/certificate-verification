@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Certificate Verification System</title>
 
 <style>
@@ -16,13 +17,15 @@
     }
 
     .card {
-        background: #fff;
-        width: 420px;
-        padding: 25px;
-        border-radius: 12px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-    }
+    background: #fff;
+    width: 100%;
+    max-width: 420px;
+    padding: 25px;
+    margin: 15px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
 
     .logo img {
         width: 180px;
@@ -150,6 +153,30 @@
         font-size: 11px;
         color: #888;
     }
+    @media (max-width: 600px) {
+
+    body {
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+
+    .logo img {
+        width: 150px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    input, button {
+        font-size: 15px;
+        padding: 11px;
+    }
+
+    .badge-container img {
+        width: 100%;
+    }
+}
 </style>
 </head>
 
@@ -248,4 +275,5 @@
 
 </body>
 </html>
+
 
